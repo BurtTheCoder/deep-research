@@ -1,8 +1,25 @@
 import { generateObject } from 'ai';
 import { z } from 'zod';
 
-import { getModel } from './ai/providers';
+import { getModel, isBedrockActive } from './ai/providers';
 import { systemPrompt } from './prompt';
+
+// Helper to construct Bedrock provider options for reasoning
+// Duplicated from deep-research.ts for simplicity, could be refactored
+function getBedrockProviderOptions() {
+  if (!isBedrockActive()) {
+    return undefined;
+  }
+  const budgetTokens = Math.max(
+    1024,
+    parseInt(process.env.BEDROCK_THINKING_BUDGET || '4000', 10),
+  );
+  return {
+    bedrock: {
+      reasoningConfig: { type: 'enabled', budgetTokens },
+    },
+  };
+}
 
 export async function generateFeedback({
   query,
@@ -22,6 +39,7 @@ export async function generateFeedback({
           `Follow up questions to clarify the research direction, max of ${numQuestions}`,
         ),
     }),
+    providerOptions: getBedrockProviderOptions(),
   });
 
   return userFeedback.object.questions.slice(0, numQuestions);

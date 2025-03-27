@@ -4,7 +4,7 @@ import { compact } from 'lodash-es';
 import pLimit from 'p-limit';
 import { z } from 'zod';
 
-import { getModel, trimPrompt } from './ai/providers';
+import { getModel, isBedrockActive, trimPrompt } from './ai/providers';
 import { systemPrompt } from './prompt';
 
 function log(...args: any[]) {
@@ -35,6 +35,22 @@ const firecrawl = new FirecrawlApp({
   apiKey: process.env.FIRECRAWL_KEY ?? '',
   apiUrl: process.env.FIRECRAWL_BASE_URL,
 });
+
+// Helper to construct Bedrock provider options for reasoning
+function getBedrockProviderOptions() {
+  if (!isBedrockActive()) {
+    return undefined;
+  }
+  const budgetTokens = Math.max(
+    1024,
+    parseInt(process.env.BEDROCK_THINKING_BUDGET || '4000', 10),
+  );
+  return {
+    bedrock: {
+      reasoningConfig: { type: 'enabled', budgetTokens },
+    },
+  };
+}
 
 // take en user query, return a list of SERP queries
 async function generateSerpQueries({
@@ -72,6 +88,7 @@ async function generateSerpQueries({
         )
         .describe(`List of SERP queries, max of ${numQueries}`),
     }),
+    providerOptions: getBedrockProviderOptions(),
   });
   log(`Created ${res.object.queries.length} queries`, res.object.queries);
 
@@ -111,6 +128,7 @@ async function processSerpResult({
           `List of follow-up questions to research the topic further, max of ${numFollowUpQuestions}`,
         ),
     }),
+    providerOptions: getBedrockProviderOptions(),
   });
   log(`Created ${res.object.learnings.length} learnings`, res.object.learnings);
 
@@ -139,6 +157,7 @@ export async function writeFinalReport({
     schema: z.object({
       reportMarkdown: z.string().describe('Final report on the topic in Markdown'),
     }),
+    providerOptions: getBedrockProviderOptions(),
   });
 
   // Append the visited URLs section to the report
@@ -168,6 +187,7 @@ export async function writeFinalAnswer({
         .string()
         .describe('The final answer, make it short and concise, just the answer, no other text'),
     }),
+    providerOptions: getBedrockProviderOptions(),
   });
 
   return res.object.exactAnswer;

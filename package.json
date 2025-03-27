@@ -25,6 +25,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "^2.2.1",
     "@ai-sdk/fireworks": "^0.1.14",
     "@ai-sdk/openai": "^1.1.9",
     "@mendable/firecrawl-js": "^1.16.0",

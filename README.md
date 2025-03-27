@@ -175,6 +175,37 @@ OPENAI_ENDPOINT="custom_endpoint"
 CUSTOM_MODEL="custom_model"
 ```
 
+### Using AWS Bedrock (Claude 3.7 Sonnet)
+
+This project supports using AWS Bedrock with the Anthropic Claude 3.7 Sonnet model (`anthropic.claude-3-7-sonnet-20250219-v1:0`) via the `@ai-sdk/amazon-bedrock` v2.x+ adapter.
+
+To enable Bedrock:
+
+1.  **Set Environment Variables:** You must explicitly set the following environment variables in your `.env.local` file. **Do not commit your actual credentials.**
+    *   `AWS_REGION`: The AWS region for Bedrock (e.g., `us-east-1`).
+    *   `AWS_ACCESS_KEY_ID`: Your AWS access key ID.
+    *   `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key.
+    *   `AWS_SESSION_TOKEN`: (Optional) Your session token if using temporary credentials.
+    *   `BEDROCK_THINKING_BUDGET`: (Optional) Set the token budget for Claude 3.7 Sonnet's extended thinking feature (min 1024, default 4000).
+
+Example `.env.local` for Bedrock:
+
+```dotenv
+# .env.local (Example for AWS Bedrock - DO NOT COMMIT ACTUAL KEYS)
+AWS_REGION="us-east-1"
+AWS_ACCESS_KEY_ID="YOUR_AWS_ACCESS_KEY_ID"
+AWS_SECRET_ACCESS_KEY="YOUR_AWS_SECRET_ACCESS_KEY"
+# AWS_SESSION_TOKEN="YOUR_AWS_SESSION_TOKEN" # Only if using temporary credentials
+
+# Optional: Configure thinking budget for Claude 3.7 Sonnet (min 1024, default 4000)
+BEDROCK_THINKING_BUDGET="4000"
+
+# You might also need Firecrawl key
+FIRECRAWL_KEY="your_firecrawl_key"
+```
+
+The system will automatically prioritize Bedrock if `AWS_REGION` is set (and the credential variables are provided). The `@ai-sdk/amazon-bedrock` v2.x+ adapter requires these explicit environment variables and does not automatically use shared credential files (`~/.aws/credentials`) or IAM roles in the same way the standard AWS SDK might.
+
 ## How It Works
 
 1. **Initial Setup**
