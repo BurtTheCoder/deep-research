@@ -8,4 +8,7 @@ COPY .env.local ./.env.local
 
 RUN npm install
 
+# Create db directory for migrations if needed
+RUN mkdir -p db/migrations
+
 CMD ["npm", "run", "docker"]

@@ -139,20 +139,45 @@ export async function writeFinalReport({
   prompt,
   learnings,
   visitedUrls,
+  format = 'standard',
 }: {
   prompt: string;
   learnings: string[];
   visitedUrls: string[];
+  format?: 'standard' | 'threat';
 }) {
   const learningsString = learnings
     .map(learning => `<learning>\n${learning}\n</learning>`)
     .join('\n');
+  
+  // Define format-specific instructions
+  let formatInstructions = '';
+  
+  if (format === 'threat') {
+    formatInstructions = `
+      This is a threat research report. Structure it following standard threat intelligence format:
+      
+      1. Executive Summary - Brief overview of the threat
+      2. Technical Analysis - Detailed breakdown of TTPs (Tactics, Techniques, and Procedures)
+      3. Indicators of Compromise - Any observed IoCs
+      4. Threat Actor Attribution - If possible
+      5. Mitigation Recommendations - Specific defensive measures
+      6. Impact Assessment - Potential business impact
+      
+      Use security terminology consistent with MITRE ATT&CK framework where applicable. 
+      Prioritize actionable intelligence and be precise about the level of confidence in each finding.
+    `;
+  }
 
   const res = await generateObject({
     model: getModel(),
     system: systemPrompt(),
     prompt: trimPrompt(
-      `Given the following prompt from the user, write a final report on the topic using the learnings from research. Make it as as detailed as possible, aim for 3 or more pages, include ALL the learnings from research:\n\n<prompt>${prompt}</prompt>\n\nHere are all the learnings from previous research:\n\n<learnings>\n${learningsString}\n</learnings>`,
+      `Given the following prompt from the user, write a final report on the topic using the learnings from research. Make it as detailed as possible, aim for 3 or more pages, include ALL the learnings from research.
+      
+      ${formatInstructions}
+      
+      <prompt>${prompt}</prompt>\n\nHere are all the learnings from previous research:\n\n<learnings>\n${learningsString}\n</learnings>`,
     ),
     schema: z.object({
       reportMarkdown: z.string().describe('Final report on the topic in Markdown'),

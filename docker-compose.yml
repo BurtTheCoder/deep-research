@@ -4,9 +4,29 @@ services:
     build: .
     env_file:
       - .env.local
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/deep_research
     volumes:
       -  ./:/app/
     tty: true
     stdin_open: true
+    depends_on:
+      - postgres
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  postgres:
+    image: postgres:16
+    container_name: deep-research-db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: deep_research
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
