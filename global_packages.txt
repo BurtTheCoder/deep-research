@@ -1,0 +1,10 @@
+/usr/local/lib
+├── @anthropic-ai/claude-code@0.2.45
+├── @burtthecoder/mcp-dnstwist@1.0.1
+├── @burtthecoder/mcp-shodan@1.0.14
+├── @burtthecoder/mcp-virustotal@1.0.6
+├── @modelcontextprotocol/server-brave-search@0.6.2
+├── mcp-maigret@1.0.10
+├── mcp-server-commands@0.4.2
+└── pm2@5.4.3
+

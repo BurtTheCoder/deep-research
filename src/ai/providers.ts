@@ -46,7 +46,7 @@ const customModel = process.env.CUSTOM_MODEL
 
 const bedrockClaudeSonnetModel = bedrock
   ? bedrock(
-      'anthropic.claude-3-7-sonnet-20250219-v1:0',
+      'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
       // Note: Enabling 'extended thinking' via the AI SDK might require
       // specific parameters not added here. This uses default settings.
       // The BEDROCK_THINKING_BUDGET env var is currently not used.
